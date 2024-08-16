@@ -10,7 +10,7 @@ export default class Logs {
     constructor(callback) {
         this.#callback = callback;
 
-        fetch(`http://85.215.185.110:7654/api/logs`)
+        fetch(`http://85.215.185.110:7654/logs`)
             .then(response => {
                 try {
                     return response.json()
