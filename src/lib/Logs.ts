@@ -1,3 +1,6 @@
+// get the port from the .env file
+const port = import.meta.env.VITE_PORT || 3000;
+
 export default class Logs {
 
     #callback;
@@ -7,7 +10,7 @@ export default class Logs {
     constructor(callback) {
         this.#callback = callback;
 
-        fetch('http://localhost:3000/logs')
+        fetch(`http://localhost:${port}/logs`)
             .then(response => {
                 try {
                     return response.json()
@@ -34,7 +37,7 @@ export default class Logs {
     }
 
     openStream() {
-        this.#eventSource = new EventSource('http://localhost:3000/logs/stream');
+        this.#eventSource = new EventSource(`http://localhost:${port}/logs/stream`);
 
         this.#eventSource.onmessage = (event) => {
             const newLog = JSON.parse(event.data);
