@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 7654;
 const logEmitter = new EventEmitter(); // Event emitter to notify new logs
 
-const path = "/Projects/Flexi/Production/FlexiApi/Logs";
+const logPath = "/Projects/Flexi/Production/FlexiApi/Logs";
 
 const date = new Date();
 const year = date.getFullYear();
@@ -19,7 +19,7 @@ const month = date.getMonth() + 1;
 const day = date.getDate();
 let logFileToday = `applog-${year}${month < 10 ? '0' + month : month}${day < 10 ? '0' + day : day}.json`;
 const GetAmountOfLines = () => {
-    const logFilePath = path.join(path, logFileToday);
+    const logFilePath = path.join(logPath, logFileToday);
 
     if (!fs.existsSync(logFilePath))
         return 0;
@@ -36,14 +36,14 @@ let lastLines = GetAmountOfLines();
 app.use(cors());
 
 app.get('/logs', (req, res) => {
-    const logFolderPath = path.join(path);
+    const logFolderPath = path.join(logPath);
 
     // loop thru all files in the logs folder
     const files = fs.readdirSync(logFolderPath);
     const finalLogs = [];
 
     for (let logFileName of files) {
-        const logFilePath = path.join(path, logFileName);
+        const logFilePath = path.join(logPath, logFileName);
         const logs = fs.readFileSync(logFilePath, 'utf8');
 
         // every line is an seperate log
@@ -83,7 +83,7 @@ setInterval(() => {
 
     if (currentLines <= lastLines) return;
 
-    const logFilePath = path.join(path, logFileToday);
+    const logFilePath = path.join(logPath, logFileToday);
     const logs = fs.readFileSync(logFilePath, 'utf8');
     const logLines = logs.split('\n').filter(Boolean).slice(lastLines);
 
