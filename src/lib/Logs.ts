@@ -10,7 +10,7 @@ export default class Logs {
     constructor(callback) {
         this.#callback = callback;
 
-        fetch(`http://localhost:${port}/api/logs`)
+        fetch(`http://85.215.185.110:7654/api/logs`)
             .then(response => {
                 try {
                     return response.json()
@@ -37,7 +37,7 @@ export default class Logs {
     }
 
     openStream() {
-        this.#eventSource = new EventSource(`http://localhost:${port}/api/logs/stream`);
+        this.#eventSource = new EventSource(`http://85.215.185.110:7654/logs/stream`);
 
         this.#eventSource.onmessage = (event) => {
             const newLog = JSON.parse(event.data);
