@@ -1,5 +1,5 @@
 // get the port from the .env file
-const port = import.meta.env.VITE_PORT || 3000;
+const port = 7654
 
 export default class Logs {
 
