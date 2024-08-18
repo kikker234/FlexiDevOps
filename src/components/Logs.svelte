@@ -1,6 +1,11 @@
-<script>
+<script lang="ts">
     import {onMount} from "svelte";
     import Logs from "../lib/Logs.ts";
+    import {BaseFilter} from "../lib/filter/BaseFilter.ts";
+    import {MetricFilter} from "../lib/filter/service/MetricFilter.ts";
+    import type {IFilter} from "../lib/filter/IFilter";
+    import {StatusCodeFilter} from "../lib/filter/service/StatusCodeFilter";
+
 
     let logs = new Logs(() => {
         logKey++;
@@ -10,13 +15,20 @@
     let pageSize = 10;
     let tracing = '';
 
+    // filters
+    let filterVariables = {
+        "showMetrics": false,
+        "statusCode": 0,
+    }
+
     onMount(() => {
         logs.openStream();
     })
 
     $: currentPage, logKey++;
+    $: filterVariables, logKey++;
 
-    const formatDateTime = (timestamp) => {
+    const formatDateTime = (timestamp: string) => {
         const date = new Date(timestamp);
 
         let day = date.getDate().toString().padStart(2, '0');
@@ -30,8 +42,9 @@
         return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}.${milliseconds}`;
     };
 
-    const getPageLogs = (pageSize) => {
+    const getPageLogs = (pageSize: number) => {
         let allLogs = logs.getAllLogs();
+        allLogs = filterLogs(allLogs);
 
         if (tracing) {
             allLogs = allLogs.filter(log => log["@tr"] === tracing);
@@ -41,13 +54,13 @@
         const maxPage = Math.ceil(allLogs.length / pageSize);
         currentPage = Math.max(1, Math.min(currentPage, maxPage));
 
-        let start = (currentPage - 1) * pageSize;
-        let end = start + pageSize;
+        let start: number = (currentPage - 1) * pageSize;
+        let end: number = start + pageSize;
 
         return allLogs.slice(start, end);
     }
 
-    const traceRequest = (id) => {
+    const traceRequest = (id: string) => {
         tracing = id;
 
         logKey++;
@@ -60,6 +73,33 @@
         logs.getAllLogs();
     }
 
+    const filterLogs = (logs: []) => {
+        let filter: IFilter = new BaseFilter();
+
+        if (!filterVariables.showMetrics)
+            filter = new MetricFilter(filter);
+
+        if (filterVariables.statusCode) {
+            console.log("Filtering by status code", filterVariables.statusCode);
+            filter = new StatusCodeFilter(filter, filterVariables.statusCode);
+        }
+
+        return filter.filter(logs);
+    }
+
+    const getAllStatusCodes = () => {
+        let codes: [] = [];
+        let log = logs.getAllLogs();
+
+        for (let logElement of log) {
+            if (logElement["StatusCode"] && !codes.includes(logElement["StatusCode"])) {
+                codes.push(logElement["StatusCode"]);
+            }
+        }
+
+        return codes;
+    }
+
 </script>
 
 {#if tracing}
@@ -67,6 +107,29 @@
 {/if}
 
 {#key logKey}
+    <div class="flex gap-3">
+        <select bind:value={filterVariables.statusCode} class="select select-bordered w-full max-w-xs">
+            <option value={0} selected={"selected"}>None</option>
+
+            {#each getAllStatusCodes() as statusCode }
+                <option value={statusCode} on:change={() => filterVariables.statusCode = statusCode}>
+                    {statusCode}
+                </option>
+            {/each}
+        </select>
+
+        <div class="">
+
+            <div class="form-control">
+                <label class="label cursor-pointer">
+                    <input type="checkbox" class="checkbox checkbox-primary" bind:value={filterVariables.showMetrics}
+                           on:click={() => filterVariables.showMetrics = !filterVariables.showMetrics} />
+                    <span class="label-text ml-3">Show metrics</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
     {#each getPageLogs(pageSize) as log}
         <div class="card mt-4">
             <div class="card-body">
