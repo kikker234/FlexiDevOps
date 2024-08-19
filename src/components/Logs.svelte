@@ -57,6 +57,21 @@
         let start: number = (currentPage - 1) * pageSize;
         let end: number = start + pageSize;
 
+        for (let log of allLogs) {
+            let template: string | never = log["@mt"];
+
+            if (template) {
+                let keys = Object.keys(log);
+                for (let key of keys) {
+                    const regex = new RegExp(`{${key}[^}]*}`, 'g');
+                    template = template.replace(regex, log[key]);
+                }
+
+                log["@mt"] = template;
+            }
+        }
+
+
         return allLogs.slice(start, end);
     }
 
@@ -80,7 +95,6 @@
             filter = new MetricFilter(filter);
 
         if (filterVariables.statusCode) {
-            console.log("Filtering by status code", filterVariables.statusCode);
             filter = new StatusCodeFilter(filter, filterVariables.statusCode);
         }
 
@@ -123,7 +137,7 @@
             <div class="form-control">
                 <label class="label cursor-pointer">
                     <input type="checkbox" class="checkbox checkbox-primary" bind:value={filterVariables.showMetrics}
-                           on:click={() => filterVariables.showMetrics = !filterVariables.showMetrics} />
+                           on:click={() => filterVariables.showMetrics = !filterVariables.showMetrics}/>
                     <span class="label-text ml-3">Show metrics</span>
                 </label>
             </div>
