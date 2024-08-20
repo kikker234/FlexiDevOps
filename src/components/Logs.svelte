@@ -146,7 +146,7 @@
 
         <select class="select select-bordered w-full sm:max-w-xs">
             {#each Object.values(Environment) as environment}
-                <option selected={selectedEnvironment === environment} value={environment} on:input={() => switchEnvironment(environment)}>
+                <option selected={selectedEnvironment === environment} value={environment} on:change={() => switchEnvironment(environment)}>
                     {environment}
                 </option>
             {/each}
