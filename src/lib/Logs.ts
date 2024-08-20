@@ -14,6 +14,7 @@ export default class Logs {
         fetch(`http://85.215.185.110:7654/logs/${environment}`)
             .then(response => {
                 try {
+                    console.log("Requesting logs from server..." + environment + " " + response.status);
                     return response.json()
                 } catch (e) {
                 }
