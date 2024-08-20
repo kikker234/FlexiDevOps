@@ -47,8 +47,8 @@ app.use(cors());
 
 app.get('/logs/:environment', (req, res) => {
     try {
-        console.log("From environment: " + environment);
         const environment = req.params.environment;
+        console.log("From environment: " + environment);
         const logFolderPath = path.join(getLogLocation(environment));
 
         // loop thru all files in the logs folder
