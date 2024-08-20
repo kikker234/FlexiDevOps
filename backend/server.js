@@ -29,7 +29,6 @@ const GetAmountOfLines = (environment) => {
 }
 
 const getLogLocation = (environment) => {
-    console.log(environment)
     const prefix = "/Projects/Flexi/";
     const suffix = "/FlexiApi/Logs";
 
