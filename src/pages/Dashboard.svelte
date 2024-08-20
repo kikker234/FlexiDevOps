@@ -15,7 +15,7 @@
 
 <Header on:logout={logout}/>
 
-<div class="p-16 gap-12 flex flex-col">
+<div class="p-2 md:p-16 gap-12 flex flex-col">
     <Links/>
 
     <Logs/>

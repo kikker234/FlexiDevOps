@@ -1,6 +1,4 @@
 <script>
-    import {LinkSquare01Icon} from "hugeicons-svelte";
-
     const cards = [
         {
             title: "Grafana",
@@ -26,21 +24,16 @@
 
 </script>
 
-<div class="flex gap-3">
+<div class="flex flex-col md:flex-row gap-3">
     {#each cards as card}
-        <div style="background-color: {card.color}" class="card text-primary-content w-full">
+        <div style="background-color: {card.color}" class="card text-primary-content w-full md:w-1/2 lg:w-1/3">
             <div class="card-body">
                 <h1 class="card-title">{card.title}</h1>
 
-                <div class="card-actions justify-end">
+                <div class="card-actions justify-end mt-4">
                     <a target="_blank" href="{card.url}">
-                        <div class="btn">
+                        <div class="btn flex items-center gap-2">
                             <p>Open</p>
-                            <LinkSquare01Icon
-                                    size={24}
-                                    color={"#ffffff"}
-                                    variant={"stroke"}
-                            />
                         </div>
                     </a>
                 </div>
