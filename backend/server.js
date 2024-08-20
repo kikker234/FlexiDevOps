@@ -47,29 +47,34 @@ let lastLines = GetAmountOfLines();
 app.use(cors());
 
 app.get('/logs/:environment', (req, res) => {
-    console.log("Params: " + req.params)
-    const environment = req.params.environment;
-    const logFolderPath = path.join(getLogLocation(environment));
+    try {
+        console.log("Params: " + req.params)
+        const environment = req.params.environment;
+        const logFolderPath = path.join(getLogLocation(environment));
 
-    // loop thru all files in the logs folder
-    const files = fs.readdirSync(logFolderPath);
-    const finalLogs = [];
+        // loop thru all files in the logs folder
+        const files = fs.readdirSync(logFolderPath);
+        const finalLogs = [];
 
-    for (let logFileName of files) {
-        const logFilePath = path.join(logPath, logFileName);
-        const logs = fs.readFileSync(logFilePath, 'utf8');
+        for (let logFileName of files) {
+            const logFilePath = path.join(getLogLocation(environment), logFileName);
+            const logs = fs.readFileSync(logFilePath, 'utf8');
 
-        // every line is an seperate log
-        const logLines = logs.split('\n')
+            // every line is an seperate log
+            const logLines = logs.split('\n')
 
-        for (let line of logLines) {
-            finalLogs.push(line);
+            for (let line of logLines) {
+                finalLogs.push(line);
+            }
         }
+
+        console.log("Returning: " + finalLogs.length + " logs");
+
+        res.json(finalLogs);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json([]);
     }
-
-    console.log("Returning: " + finalLogs.length + " logs");
-
-    res.json(finalLogs);
 });
 
 app.get('/logs/stream', (req, res) => {
