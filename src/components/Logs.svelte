@@ -29,8 +29,8 @@
             logKey++;
         }, environment);
 
-
         logKey++;
+        console.log("Key is now: " + logKey)
     }
 
     onMount(() => {

@@ -48,7 +48,6 @@ app.use(cors());
 
 app.get('/logs/:environment', (req, res) => {
     try {
-        console.log("Params: " + req.params)
         const environment = req.params.environment;
         const logFolderPath = path.join(getLogLocation(environment));
 
@@ -68,6 +67,7 @@ app.get('/logs/:environment', (req, res) => {
             }
         }
 
+        console.log("From environment: " + environment);
         console.log("Returning: " + finalLogs.length + " logs");
 
         res.json(finalLogs);
