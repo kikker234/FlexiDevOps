@@ -56,6 +56,7 @@ app.get('/logs/:environment', (req, res) => {
 
         for (let logFileName of files) {
             const logFilePath = path.join(getLogLocation(environment), logFileName);
+            console.log("Getting logs from: " + logFilePath + " for environment: " + environment + " ...");
             const logs = fs.readFileSync(logFilePath, 'utf8');
 
             // every line is an seperate log
