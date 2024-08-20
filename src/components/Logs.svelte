@@ -5,11 +5,13 @@
     import {MetricFilter} from "../lib/filter/service/MetricFilter.ts";
     import type {IFilter} from "../lib/filter/IFilter";
     import {StatusCodeFilter} from "../lib/filter/service/StatusCodeFilter";
+    import {Environment} from "../lib/Environment";
 
 
+    let selectedEnvironment = Environment.PROD;
     let logs = new Logs(() => {
         logKey++;
-    });
+    }, selectedEnvironment);
     let logKey = 0;
     let currentPage = 1;
     let pageSize = 10;
@@ -19,6 +21,16 @@
     let filterVariables = {
         "showMetrics": false,
         "statusCode": 0,
+    }
+
+    const switchEnvironment = (environment: Environment) => {
+        selectedEnvironment = environment;
+        logs = new Logs(() => {
+            logKey++;
+        }, environment);
+
+
+        logKey++;
     }
 
     onMount(() => {
@@ -127,6 +139,14 @@
             {#each getAllStatusCodes() as statusCode }
                 <option value={statusCode} on:change={() => filterVariables.statusCode = statusCode}>
                     {statusCode}
+                </option>
+            {/each}
+        </select>
+
+        <select class="select select-bordered w-full sm:max-w-xs">
+            {#each Object.values(Environment) as environment}
+                <option selected={selectedEnvironment === environment} value={environment} on:change={() => switchEnvironment(environment)}>
+                    {environment}
                 </option>
             {/each}
         </select>

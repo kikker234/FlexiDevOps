@@ -1,4 +1,6 @@
 // get the port from the .env file
+import type {Environment} from "./Environment";
+
 const port = 7654
 
 export default class Logs {
@@ -7,10 +9,9 @@ export default class Logs {
     #eventSource;
     logs = [];
 
-    constructor(callback) {
+    constructor(callback, environment: Environment) {
         this.#callback = callback;
-
-        fetch(`http://85.215.185.110:7654/logs`)
+        fetch(`http://85.215.185.110:7654/logs/${environment}`)
             .then(response => {
                 try {
                     return response.json()

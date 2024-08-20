@@ -11,15 +11,13 @@ const app = express();
 const PORT = process.env.PORT || 7654;
 const logEmitter = new EventEmitter(); // Event emitter to notify new logs
 
-const logPath = "/Projects/Flexi/Production/FlexiApi/Logs";
-
 const date = new Date();
 const year = date.getFullYear();
 const month = date.getMonth() + 1;
 const day = date.getDate();
 let logFileToday = `applog-${year}${month < 10 ? '0' + month : month}${day < 10 ? '0' + day : day}.json`;
-const GetAmountOfLines = () => {
-    const logFilePath = path.join(logPath, logFileToday);
+const GetAmountOfLines = (environment) => {
+    const logFilePath = path.join(getLogLocation(environment), logFileToday);
 
     if (!fs.existsSync(logFilePath))
         return 0;
@@ -30,13 +28,28 @@ const GetAmountOfLines = () => {
     return logLines.length;
 }
 
+const getLogLocation = (environment) => {
+    console.log(environment)
+    const prefix = "/Projects/Flexi/";
+    const suffix = "/FlexiApi/Logs";
+
+    switch (environment) {
+        case "":
+            return prefix + "Dev" + suffix;
+        default:
+            return prefix + "Production" + suffix;
+    }
+}
+
 
 let lastLines = GetAmountOfLines();
 
 app.use(cors());
 
-app.get('/logs', (req, res) => {
-    const logFolderPath = path.join(logPath);
+app.get('/logs/:environment', (req, res) => {
+    console.log("Params: " + req.params)
+    const environment = req.params.environment;
+    const logFolderPath = path.join(getLogLocation(environment));
 
     // loop thru all files in the logs folder
     const files = fs.readdirSync(logFolderPath);
@@ -78,21 +91,21 @@ app.get('/logs/stream', (req, res) => {
     });
 });
 
-setInterval(() => {
-    const currentLines = GetAmountOfLines();
-
-    if (currentLines <= lastLines) return;
-
-    const logFilePath = path.join(logPath, logFileToday);
-    const logs = fs.readFileSync(logFilePath, 'utf8');
-    const logLines = logs.split('\n').filter(Boolean).slice(lastLines);
-
-    logLines.forEach((log) => {
-        logEmitter.emit('newLog', log);
-    });
-
-    lastLines = currentLines;
-}, 500)
+// setInterval(() => {
+//     const currentLines = GetAmountOfLines();
+//
+//     if (currentLines <= lastLines) return;
+//
+//     const logFilePath = path.join(logPath, logFileToday);
+//     const logs = fs.readFileSync(logFilePath, 'utf8');
+//     const logLines = logs.split('\n').filter(Boolean).slice(lastLines);
+//
+//     logLines.forEach((log) => {
+//         logEmitter.emit('newLog', log);
+//     });
+//
+//     lastLines = currentLines;
+// }, 500)
 
 app.listen(PORT, "0.0.0.0",() => {
     console.log(`Server running on port ${PORT}`);
