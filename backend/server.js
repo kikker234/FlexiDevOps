@@ -33,7 +33,7 @@ const getLogLocation = (environment) => {
     const suffix = "/FlexiApi/Logs";
 
     switch (environment) {
-        case "":
+        case "Preview":
             return prefix + "Dev" + suffix;
         default:
             return prefix + "Production" + suffix;
@@ -47,6 +47,7 @@ app.use(cors());
 
 app.get('/logs/:environment', (req, res) => {
     try {
+        console.log("From environment: " + environment);
         const environment = req.params.environment;
         const logFolderPath = path.join(getLogLocation(environment));
 
@@ -67,7 +68,6 @@ app.get('/logs/:environment', (req, res) => {
             }
         }
 
-        console.log("From environment: " + environment);
         console.log("Returning: " + finalLogs.length + " logs");
 
         res.json(finalLogs);
