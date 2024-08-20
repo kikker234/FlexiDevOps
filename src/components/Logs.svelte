@@ -24,6 +24,7 @@
     }
 
     const switchEnvironment = (environment: Environment) => {
+        console.log("Switching environment to: " + environment)
         selectedEnvironment = environment;
         logs = new Logs(() => {
             logKey++;
