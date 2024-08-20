@@ -23,7 +23,7 @@
         "statusCode": 0,
     }
 
-    const switchEnvironment = (environment: Environment) => {
+    const switchEnvironment = (environment) => {
         console.log("Switching environment to: " + environment)
         selectedEnvironment = environment;
         logs = new Logs(() => {
