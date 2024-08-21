@@ -41,6 +41,7 @@ export default class Logs {
     }
 
     openStream() {
+        console.log("Opening stream..." + this.#environment)
         this.#eventSource = new EventSource(`http://85.215.185.110:7654/logs/stream/${this.#environment}`);
 
         this.#eventSource.onmessage = (event) => {
