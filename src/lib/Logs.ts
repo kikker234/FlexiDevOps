@@ -12,6 +12,7 @@ export default class Logs {
     logs = [];
 
     constructor(callback, environment: Environment) {
+        this.#environment = environment
         this.#callback = callback;
         fetch(`http://85.215.185.110:7654/logs/${environment}`)
             .then(response => {
