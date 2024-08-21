@@ -24,11 +24,14 @@
     }
 
     const switchEnvironment = (environment) => {
+        logs.closeStream()
+
         console.log("Switching environment to: " + environment)
         selectedEnvironment = environment;
         logs = new Logs(() => {
             logKey++;
         }, environment);
+        logs.openStream();
 
         logKey++;
         console.log("Key is now: " + logKey)
