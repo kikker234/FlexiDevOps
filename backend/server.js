@@ -19,8 +19,10 @@ let logFileToday = `applog-${year}${month < 10 ? '0' + month : month}${day < 10 
 const GetAmountOfLines = (environment) => {
     const logFilePath = path.join(getLogLocation(environment), logFileToday);
 
-    if (!fs.existsSync(logFilePath))
+    if (!fs.existsSync(logFilePath)) {
+        console.error("Log file not found: " + logFilePath)
         return 0;
+    }
 
     const logs = fs.readFileSync(logFilePath, 'utf8');
     const logLines = logs.split('\n').filter(Boolean);
@@ -82,12 +84,11 @@ app.get('/logs/stream/:environment', (req, res) => {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders(); // Verstuur headers
 
-    let lastLines = GetAmountOfLines(environment); // Start de lijnenteller voor deze client
+    let lastLines = GetAmountOfLines(environment);
 
     // Interval om de logs periodiek te controleren en door te sturen
     const intervalId = setInterval(() => {
         const currentLines = GetAmountOfLines(environment);
-
 
         if (currentLines > lastLines) {
             const logFilePath = path.join(getLogLocation(environment), logFileToday);
