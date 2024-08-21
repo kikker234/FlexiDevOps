@@ -88,7 +88,6 @@ app.get('/logs/stream/:environment', (req, res) => {
     const intervalId = setInterval(() => {
         const currentLines = GetAmountOfLines(environment);
 
-        console.log("Current lines: " + currentLines + " Last lines: " + lastLines);
 
         if (currentLines > lastLines) {
             const logFilePath = path.join(getLogLocation(environment), logFileToday);
