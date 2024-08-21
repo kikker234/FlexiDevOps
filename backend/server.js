@@ -88,12 +88,15 @@ app.get('/logs/stream/:environment', (req, res) => {
     const intervalId = setInterval(() => {
         const currentLines = GetAmountOfLines(environment);
 
+        console.log("Current lines: " + currentLines + " Last lines: " + lastLines);
+
         if (currentLines > lastLines) {
             const logFilePath = path.join(getLogLocation(environment), logFileToday);
             const logs = fs.readFileSync(logFilePath, 'utf8');
             const logLines = logs.split('\n').filter(Boolean).slice(lastLines);
 
             logLines.forEach((log) => {
+                console.log("New logs send to client: " + log)
                 res.write(`data: ${log}\n\n`); // Verstuur de nieuwe log naar de client
             });
 
