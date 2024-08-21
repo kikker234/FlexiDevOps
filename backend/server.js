@@ -45,7 +45,6 @@ app.use(cors());
 app.get('/logs/:environment', (req, res) => {
     try {
         const environment = req.params.environment;
-        console.log("From environment: " + environment);
         const logFolderPath = path.join(getLogLocation(environment));
 
         // loop thru all files in the logs folder
@@ -54,7 +53,6 @@ app.get('/logs/:environment', (req, res) => {
 
         for (let logFileName of files) {
             const logFilePath = path.join(getLogLocation(environment), logFileName);
-            console.log("Getting logs from: " + logFilePath + " for environment: " + environment + " ...");
             const logs = fs.readFileSync(logFilePath, 'utf8');
 
             // every line is an seperate log
@@ -65,7 +63,7 @@ app.get('/logs/:environment', (req, res) => {
             }
         }
 
-        console.log("Returning: " + finalLogs.length + " logs");
+        console.log("Returning: " + finalLogs.length + " logs from: " + environment + " environment");
 
         res.json(finalLogs);
     } catch (error) {

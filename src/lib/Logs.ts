@@ -7,6 +7,8 @@ export default class Logs {
 
     #callback;
     #eventSource;
+    #environment: Environment;
+
     logs = [];
 
     constructor(callback, environment: Environment) {
@@ -39,7 +41,7 @@ export default class Logs {
     }
 
     openStream() {
-        this.#eventSource = new EventSource(`http://85.215.185.110:7654/logs/stream`);
+        this.#eventSource = new EventSource(`http://85.215.185.110:7654/logs/stream/${this.#environment}`);
 
         this.#eventSource.onmessage = (event) => {
             const newLog = JSON.parse(event.data);
