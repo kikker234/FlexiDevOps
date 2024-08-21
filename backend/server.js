@@ -40,9 +40,6 @@ const getLogLocation = (environment) => {
     }
 }
 
-
-let lastLines = GetAmountOfLines();
-
 app.use(cors());
 
 app.get('/logs/:environment', (req, res) => {
@@ -77,40 +74,40 @@ app.get('/logs/:environment', (req, res) => {
     }
 });
 
-app.get('/logs/stream', (req, res) => {
-    console.log('Client connected to logs stream')
+app.get('/logs/stream/:environment', (req, res) => {
+    console.log('Client connected to logs stream');
+
+    const environment = req.params.environment;
+
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
-    res.flushHeaders(); // Send headers
+    res.flushHeaders(); // Verstuur headers
 
-    const onNewLog = (log) => {
-        res.write(`data: ${log}\n\n`);
-    };
+    let lastLines = GetAmountOfLines(environment); // Start de lijnenteller voor deze client
 
-    logEmitter.on('newLog', onNewLog);
+    // Interval om de logs periodiek te controleren en door te sturen
+    const intervalId = setInterval(() => {
+        const currentLines = GetAmountOfLines(environment);
+
+        if (currentLines > lastLines) {
+            const logFilePath = path.join(getLogLocation(environment), logFileToday);
+            const logs = fs.readFileSync(logFilePath, 'utf8');
+            const logLines = logs.split('\n').filter(Boolean).slice(lastLines);
+
+            logLines.forEach((log) => {
+                res.write(`data: ${log}\n\n`); // Verstuur de nieuwe log naar de client
+            });
+
+            lastLines = currentLines;
+        }
+    }, 500);
 
     req.on('close', () => {
         console.log("Client disconnected from logs stream");
-        logEmitter.removeListener('newLog', onNewLog);
+        clearInterval(intervalId); // Stop het interval wanneer de client loskoppelt
     });
 });
-
-// setInterval(() => {
-//     const currentLines = GetAmountOfLines();
-//
-//     if (currentLines <= lastLines) return;
-//
-//     const logFilePath = path.join(logPath, logFileToday);
-//     const logs = fs.readFileSync(logFilePath, 'utf8');
-//     const logLines = logs.split('\n').filter(Boolean).slice(lastLines);
-//
-//     logLines.forEach((log) => {
-//         logEmitter.emit('newLog', log);
-//     });
-//
-//     lastLines = currentLines;
-// }, 500)
 
 app.listen(PORT, "0.0.0.0",() => {
     console.log(`Server running on port ${PORT}`);
