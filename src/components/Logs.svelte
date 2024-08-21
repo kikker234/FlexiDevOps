@@ -7,6 +7,8 @@
     import {StatusCodeFilter} from "../lib/filter/service/StatusCodeFilter";
     import {Environment} from "../lib/Environment";
 
+    import autoAnimate from '@formkit/auto-animate';
+
 
     let selectedEnvironment = Environment.PROD;
     let logs = new Logs(() => {
@@ -147,7 +149,8 @@
             {/each}
         </select>
 
-        <select class="select select-bordered w-full sm:max-w-xs" on:change={(event) => switchEnvironment(event.target.value)}>
+        <select class="select select-bordered w-full sm:max-w-xs"
+                on:change={(event) => switchEnvironment(event.target.value)}>
             {#each Object.values(Environment) as environment}
                 <option value={environment} selected={selectedEnvironment === environment}>
                     {environment}
@@ -166,30 +169,33 @@
         </div>
     </div>
 
-    {#each getPageLogs(pageSize) as log}
-        <div class="card bg-base-300 shadow-xl mt-4">
-            <div class="card-body">
-                <div class="flex flex-col sm:flex-row justify-between">
-                    <h2 class="card-title">
-                        {#if log["StatusCode"]}
-                            {log["StatusCode"]}
-                        {:else}
-                            {log["@l"] ?? "Information"}
-                        {/if}
-                    </h2>
-                    <span>{formatDateTime(log["@t"])}</span>
+    <div class="" use:autoAnimate>
+        {#each getPageLogs(pageSize) as log}
+            <div class="card bg-base-300 shadow-xl mt-4">
+                <div class="card-body">
+                    <div class="flex flex-col sm:flex-row justify-between">
+                        <h2 class="card-title">
+                            {#if log["StatusCode"]}
+                                {log["StatusCode"]}
+                            {:else}
+                                {log["@l"] ?? "Information"}
+                            {/if}
+                        </h2>
+                        <span>{formatDateTime(log["@t"])}</span>
+                    </div>
+
+                    <p>{log["@mt"]}</p>
+
+                    {#if !tracing}
+                        <button class="btn btn-primary btn-outline w-full sm:w-auto mt-2 sm:mt-0"
+                                on:click={() => traceRequest(log["@tr"])}>
+                            Trace request
+                        </button>
+                    {/if}
                 </div>
-
-                <p>{log["@mt"]}</p>
-
-                {#if !tracing}
-                    <button class="btn btn-primary btn-outline w-full sm:w-auto mt-2 sm:mt-0" on:click={() => traceRequest(log["@tr"])}>
-                        Trace request
-                    </button>
-                {/if}
             </div>
-        </div>
-    {/each}
+        {/each}
+    </div>
 {/key}
 
 <div class="flex flex-col sm:flex-row justify-between items-center mt-4">
