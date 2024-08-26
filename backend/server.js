@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import {EventEmitter} from 'events';
+import environments from '../src/assets/environments.json' assert { type: 'json' };
 import fs from 'fs';
 import path from 'path';
 
@@ -20,7 +21,6 @@ const GetAmountOfLines = (environment) => {
     const logFilePath = path.join(getLogLocation(environment), logFileToday);
 
     if (!fs.existsSync(logFilePath)) {
-        console.error("Log file not found: " + logFilePath)
         return 0;
     }
 
@@ -31,15 +31,15 @@ const GetAmountOfLines = (environment) => {
 }
 
 const getLogLocation = (environment) => {
-    const prefix = "/Projects/Flexi/";
-    const suffix = "/FlexiApi/Logs";
+    // where name is the name of the environment
+    const env = environments.find((env) => env.name === environment);
 
-    switch (environment) {
-        case "Preview":
-            return prefix + "Dev" + suffix;
-        default:
-            return prefix + "Production" + suffix;
+    if (!env) {
+        console.error("Environment not found: " + environment);
+        return "";
     }
+
+    return env["log_location"];
 }
 
 app.use(cors());
@@ -47,7 +47,7 @@ app.use(cors());
 app.get('/logs/:environment', (req, res) => {
     try {
         const environment = req.params.environment;
-        const logFolderPath = path.join(getLogLocation(environment));
+        const logFolderPath = getLogLocation(environment);
 
         // loop thru all files in the logs folder
         const files = fs.readdirSync(logFolderPath);
